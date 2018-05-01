@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <link rel=stylesheet type=text/css href="static/css/bootstrap.min.css">
+		<link rel=stylesheet type=text/css href="static/css/app.css">
+    <script type='text/javascript' src='js/lib/knockout-3.4.2.js'></script>
+  </head>
+  <body>
+    <div class="container">
+      <div>
+        <div class="row">
+          <div class="col-3">
+            <div class="nav flex-column nav-pills" id="v-pills-tab" role="tablist" aria-orientation="vertical" data-bind="foreach: places">
+              <a class="nav-link" id="v-pills-home-tab" data-toggle="pill" href="#v-pills-home" role="tab" aria-controls="v-pills-home" aria-selected="false" data-bind="text: address">test1</a>
+            </div>
+          </div>
+          <div class="col-9">
+            <div class="tab-content">
+              <div id="map"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>
