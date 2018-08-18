@@ -14,14 +14,14 @@
                         <h5 class="navbar-header-text">Locations</h5>
                     </header>
                     <form>
-                        <row>
-                            <div style="display: inline-block">
+                        <div class="row">
+                            <div style="display: inline-block;">
                                 <input class="col-9" style="float: left" type="search" id="filterInput" data-bind="value: filterInput">
                                 <button class="col-3" style="width: 45px; float: left;" data-bind="click: $root.filterClicked">
                                     <i class="fa fa-search"></i>
                                 </button>
                             </div>
-                        </row>
+                        </div>
                     </form>
                     <div class="nav flex-column nav-pills" id="v-pills-tab" role="tablist" aria-orientation="vertical" data-bind="foreach: filterPlaces">
                         <a class="nav-link" data-toggle="pill" href="#v-pills-home"
