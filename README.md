@@ -1,6 +1,6 @@
-# Project Title
+# Neighborhood Project
 
-Neighborhood Project - Frameworks & API Calls (Udacity Project)
+KnockoutJS Framework & GoogleMaps and Foursquare API Calls (Udacity Project)
 
 ## Getting Started
 
