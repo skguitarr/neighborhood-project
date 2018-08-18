@@ -1,29 +1,147 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <link rel=stylesheet type=text/css href="static/css/bootstrap.min.css">
-    <link rel=stylesheet type=text/css href="static/css/app.css">
-  </head>
-  <body>
-    <div class="container">
-      <div>
-        <div class="row">
-  		<div class="col-3">
-    			<div class="nav flex-column nav-pills" id="v-pills-tab" role="tablist" aria-orientation="vertical" data-bind="foreach: places">
-      				<a class="nav-link" id="v-pills" data-toggle="pill" href="#v-pills-home" role="tab" data-bind="text: address, css: extraClass, click: $parent.hello"></a>
-   			 </div>
-		</div>
-          	<div class="col-9">
-            		<div class="tab-content">
-              			<div id="map"></div>
-            		</div>
-		</div>
+    <head>
+        <title>Neighborhood Map</title>
+        <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
+        <link rel=stylesheet type=text/css href="static/css/bootstrap.min.css">
+        <link rel=stylesheet type=text/css href="static/css/app.css">
+    </head>
+    <body>
+        <div class="row container-div">
+            <div id="navDivId" class="col-3 navbar-main">
+                <nav>
+                    <header class="navbar-header">
+                        <h5 class="navbar-header-text">Locations</h5>
+                    </header>
+                    <form>
+                        <row>
+                            <div style="display: inline-block">
+                                <input class="col-9" style="float: left" type="search" id="filterInput" data-bind="value: filterInput">
+                                <button class="col-3" style="width: 45px; float: left;" data-bind="click: $root.filterClicked">
+                                    <i class="fa fa-search"></i>
+                                </button>
+                            </div>
+                        </row>
+                    </form>
+                    <div class="nav flex-column nav-pills" id="v-pills-tab" role="tablist" aria-orientation="vertical" data-bind="foreach: filterPlaces">
+                        <a class="nav-link" data-toggle="pill" href="#v-pills-home"
+                           role="tab" data-bind="text: title, click: $root.placeSelected"></a>
+                        <!--css: { warningMessage : StudentMale }-->
+                    </div>
+                </nav>
+            </div>
+            <div id="mainDivId" class="col-9 map-main">
+                <header class="map-header">
+                    <div class="fa fa-bars list-toggle-btn" aria-hidden="true" data-bind="click: $root.toggleNav"></div>
+                    <span class="map-header-text">Neighborhood Map:
+                        <strong class="map-header-address" data-bind="text: selectedPlace().title"></strong>
+                    </span>
+                </header>
+                <div id="map"></div>
+            </div>
         </div>
-      </div>
-    </div>
-  </body>
-  <script type='text/javascript' src='js/lib/jquery-3.3.1.min.js'></script>
-  <script type='text/javascript' src='js/lib/bootstrap.min.js'></script>
-  <script type='text/javascript' src='js/lib/knockout-3.4.2.js'></script>
-  <script type='text/javascript' src='js/app.js'></script>
+    </body>
+    <script type='text/javascript' src='js/lib/jquery-3.3.1.min.js'></script>
+    <script type='text/javascript' src='js/lib/bootstrap.min.js'></script>
+    <script type='text/javascript' src='js/lib/knockout-3.4.2.js'></script>
+    <script type='text/javascript' src='js/app.js'></script>
+    <script>
+        var map;
+        var largeInfowindow;
+        var markers = [];
+        var atlantaLatLong = {lat: 33.753746, lng: -84.386330};
+        var fsUrlPrefix = 'https://api.foursquare.com/v2/venues/';
+        var fsUrlPostfix = '/tips?client_id=BQCHVI4YSSZ2ZJHLTKCLQHOQECBLVSFOKHE5C1RW5F0XZF3S&client_secret=MCWRQVQM04PXAC0XJ0YQ4VYQGU4W0FTSRLAH3O2GF5PUEK4K&v=20180323';
+        var fsTip = "";
+
+        function initMap() {
+            map = new google.maps.Map(document.getElementById('map'), {center: atlantaLatLong, zoom: 13});
+            largeInfowindow = new google.maps.InfoWindow();
+
+            // The following group uses the location array to create an array of markers on initialize.
+            for (var i = 0; i < locations.length; i++) {
+                // Get the position from the location array.
+                var position = locations[i].location;
+                var title = locations[i].title;
+                // Create a marker per location, and put into markers array.
+                 var marker = new google.maps.Marker({
+                  position: position,
+                  title: title,
+                  animation: google.maps.Animation.DROP,
+                  id: i
+                });
+                // Push the marker to our array of markers.
+                markers.push(marker);
+                // Create an onclick event to open an infowindow at each marker.
+                marker.addListener('click', function() {
+                    getFourSquareTipAndPopulateInfoWindow(this);
+                });
+            }
+
+            //Get the foursquare data and populate the info window
+            function getFourSquareTipAndPopulateInfoWindow(place) {
+                var fsUrl = fsUrlPrefix + locations[place.id].venueId + fsUrlPostfix;
+
+                var fsRequestTimeout = setTimeout(function(){
+                    alert("Failed to get foursquare resources. Please try again later.");
+                    fsTip = "Failed to get foursquare resources. Please try again later.";
+                }, 8000);
+
+                $.ajax({
+                    url: fsUrl,
+                    dataType: "jsonp",
+                    jsonp: "callback",
+                    success: function( json ) {
+                        if (json && json.response && json.response.tips) {
+                            fsTip = json.response.tips.items[0].text;
+                        }
+                        else {
+                            fsTip = "ERROR: " + json.meta.errorDetail;
+                        }
+
+                        clearTimeout(fsRequestTimeout);
+                        populateInfoWindow(place, largeInfowindow);
+                        handleAnimation(place);
+                    }
+                });
+            };
+
+            function handleAnimation(marker) {
+                marker.setAnimation(google.maps.Animation.BOUNCE);
+                setTimeout(function(){ marker.setAnimation(null); }, 2100);
+            };
+
+            // This function populates the infowindow when the marker is clicked. We'll only allow
+            // one infowindow which will open at the marker that is clicked, and populate based
+            // on that markers position.
+            function populateInfoWindow(marker, infowindow) {
+                // Check to make sure the infowindow is not already opened on this marker.
+                if (infowindow.marker !== marker) {
+                  infowindow.marker = marker;
+                  infowindow.setContent('<div><strong>' + marker.title + '</strong></div><br><div>FourSquare Featured TIP:</div><div>' + fsTip + '</div>');
+                  infowindow.open(map, marker);
+                  // Make sure the marker property is cleared if the infowindow is closed.
+                  infowindow.addListener('closeclick', function() {
+                    infowindow.marker = null;
+                  });
+                }
+            };
+            // This function will loop through the markers array and display them all.
+            function showListings() {
+                var bounds = new google.maps.LatLngBounds();
+                // Extend the boundaries of the map for each marker and display the marker
+                for (var i = 0; i < markers.length; i++) {
+                  markers[i].setMap(map);
+                  bounds.extend(markers[i].position);
+                }
+                map.fitBounds(bounds);
+            };
+
+            showListings();
+        };
+    </script>
+
+    <script async defer
+        src="https://maps.googleapis.com/maps/api/js?key=AIzaSyD-dxDqnvyhJ7wHOGDp_tG-XPZgUE169aM&v=3&callback=initMap">
+    </script>
 </html>
