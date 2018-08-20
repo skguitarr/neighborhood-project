@@ -78,33 +78,31 @@
                     getFourSquareTipAndPopulateInfoWindow(this);
                 });
             }
+            
+            function loadMapError() {
+                alert("There was an error loading the Google Map. Try again later.");
+            };
 
             //Get the foursquare data and populate the info window
             function getFourSquareTipAndPopulateInfoWindow(place) {
                 var fsUrl = fsUrlPrefix + locations[place.id].venueId + fsUrlPostfix;
 
-                var fsRequestTimeout = setTimeout(function(){
-                    alert("Failed to get foursquare resources. Please try again later.");
-                    fsTip = "Failed to get foursquare resources. Please try again later.";
-                }, 8000);
-
-                $.ajax({
-                    url: fsUrl,
-                    dataType: "jsonp",
-                    jsonp: "callback",
-                    success: function( json ) {
+                var jqxhr = $.ajax(fsUrl)
+                    .done(function(json) {
                         if (json && json.response && json.response.tips) {
                             fsTip = json.response.tips.items[0].text;
                         }
                         else {
                             fsTip = "ERROR: " + json.meta.errorDetail;
                         }
-
-                        clearTimeout(fsRequestTimeout);
+                    })
+                    .fail(function() {
+                        alert("Failed to get foursquare resources. Please try again later.");
+                    })
+                    .always(function() {
                         populateInfoWindow(place, largeInfowindow);
                         handleAnimation(place);
-                    }
-                });
+                    });
             };
 
             function handleAnimation(marker) {
@@ -143,6 +141,6 @@
     </script>
 
     <script async defer
-        src="https://maps.googleapis.com/maps/api/js?key=AIzaSyD-dxDqnvyhJ7wHOGDp_tG-XPZgUE169aM&v=3&callback=initMap">
+        src="https://maps.googleapis.com/maps/api/js?key=AIzaSyD-dxDqnvyhJ7wHOGDp_tG-XPZgUE169aM&v=3&callback=initMap" onerror="loadMapError()">
     </script>
 </html>
