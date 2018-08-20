@@ -15,19 +15,18 @@
                         <h5 class="navbar-header-text">Locations</h5>
                     </header>
                     <form>
-                        <div class="row">
+                        <div class="row filter-row">
                             <div style="display: inline-block;">
                                 <input class="col-9" style="float: left" type="search" id="filterInput" data-bind="value: filterInput">
-                                <button class="col-3" style="width: 45px; float: left;" data-bind="click: $root.filterClicked">
-                                    <i class="fa fa-search"></i>
+                                <button class="col-3 filter-btn" data-bind="click: $root.filterClicked">
+                                    <i class="fa fa-search search-icon"></i>
                                 </button>
                             </div>
                         </div>
                     </form>
                     <div class="nav flex-column nav-pills" id="v-pills-tab" role="tablist" aria-orientation="vertical" data-bind="foreach: filterPlaces">
-                        <a class="nav-link" data-toggle="pill" href="#v-pills-home"
+                        <a id="locationListItem" class="nav-link" data-toggle="pill" href="#v-pills-home"
                            role="tab" data-bind="text: title, click: $root.placeSelected"></a>
-                        <!--css: { warningMessage : StudentMale }-->
                     </div>
                 </nav>
             </div>
@@ -35,7 +34,7 @@
                 <header class="map-header">
                     <div class="fa fa-bars list-toggle-btn" aria-hidden="true" data-bind="click: $root.toggleNav"></div>
                     <span class="map-header-text">Neighborhood Map:
-                        <strong class="map-header-address" data-bind="text: selectedPlace().title"></strong>
+                        <strong class="map-header-location" data-bind="text: selectedPlace().title"></strong>
                     </span>
                 </header>
                 <div id="map"></div>
@@ -117,7 +116,8 @@
                 // Check to make sure the infowindow is not already opened on this marker.
                 if (infowindow.marker !== marker) {
                   infowindow.marker = marker;
-                  infowindow.setContent('<div><strong>' + marker.title + '</strong></div><br><div>FourSquare Featured TIP:</div><div>' + fsTip + '</div>');
+                  infowindow.setContent('<div id="infoContents"><div><strong>' + marker.title + '</strong></div><br><div>FourSquare Featured TIP:</div><div>' + fsTip + '</div></div>');
+                  infowindow.setOptions({maxWidth:150});
                   infowindow.open(map, marker);
                   // Make sure the marker property is cleared if the infowindow is closed.
                   infowindow.addListener('closeclick', function() {

@@ -26,6 +26,16 @@ html, body {
     color: white;
 }
 
+.map-header-text {
+    padding-left: 12px;
+    position: relative;
+    top: -3px;
+}
+
+.map-header-location {
+    padding-left: 12px;
+}
+
 .navbar-main {
     padding-right: 0px !important;
     background-color: lightgray;
@@ -43,20 +53,19 @@ html, body {
     color: white;
 }
 
-.map-header-text {
-    padding-left: 12px;
-    position: relative;
-    top: -3px;
-}
-
-.map-header-address {
-    padding-left: 12px;
-}
-
 .list-toggle-btn {
     font-size: 24px;
     padding-top: 9px;
     padding-left: 24px;
+}
+
+.filter-row {
+    width: 100%;
+}
+
+.filterBtn {
+    width: 45px; 
+    float: left;
 }
 
 #map {
@@ -69,4 +78,44 @@ html, body {
 
 .hideLocation {
     display: none;
+}
+
+@media screen and (max-width: 980px) {
+    .filter-btn {
+        width: 24px;
+        font-size: 12px;
+        height: 30px;
+    }
+
+    .search-icon {
+        position: relative;
+        left: -3px;
+    }
+
+    .filter-row {
+        width: 150px !important;
+    } 
+
+    #locationListItem {
+        font-size: 12px;
+    }
+}
+
+@media screen and (max-width: 600px) {
+    .filter-row {
+        width: 75px !important;
+    }         
+
+    .navbar-header-text {
+        font-size: 12px;
+        padding-top: 20px;
+    }
+    
+    .map-header-text {
+        font-size: 10px;
+    }    
+
+    .map-header-location {
+        padding-left: 12px;
+    }
 }
